@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        :root {
+            --primary: #D2691E;
+            --secondary: #0047AB;
+            --light: #FFFDD0;
+            --dark: #333;
+            --white: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .school-logo-header {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid var(--white);
+        }
+        
+        .school-logo-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hamburger-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--white);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .content-section {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        /* Button Styles */
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: var(--white);
+        }
+        
+        .btn-light {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        /* Image Upload Styles */
+        .image-upload-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        
+        .image-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .upload-btn {
+            background: var(--secondary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .upload-btn input {
+            display: none;
+        }
+        
+        /* Subject Styles */
+        .subject-container {
+            border: 2px solid #e1e1e1;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .subcategory-row {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+        }
+        
+        .subcategory-row input {
+            margin: 0;
+        }
+        
+        /* Student Cards */
+        .student-card {
+            background: var(--light);
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .student-card-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .student-card-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        .student-card.expanded .student-card-content {
+            max-height: 2000px;
+            padding: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .student-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .student-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .student-info {
+            flex: 1;
+        }
+        
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .student-name {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+        
+        .student-class {
+            background: var(--primary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .student-position {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+        
+        .student-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .score-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .subject-name {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .score-value {
+            font-size: 1.3rem;
+            margin-top: 8px;
+            color: var(--dark);
+        }
+        
+        .student-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        /* Total Display */
+        .total-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Table Styles */
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        .result-table th, .result-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .result-table th {
+            background: var(--secondary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .result-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        /* Class Management */
+        .class-management {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .class-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .class-tag {
+            background: var(--secondary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .class-tag button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        /* Expand/Collapse Arrow */
+        .expand-arrow {
+            transition: transform 0.3s ease;
+        }
+        
+        .student-card.expanded .expand-arrow {
+            transform: rotate(180deg);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .student-card.expanded .student-card-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .student-photo {
+                align-self: center;
+            }
+            
+            .student-scores {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .student-actions {
+                flex-direction: column;
+            }
+            
+            .subcategory-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                padding: 12px 15px;
+            }
+            
+            .school-logo-header {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .content-section {
+                padding: 15px;
+            }
+            
+            .student-scores {
+                grid-template-columns: 1fr;
+            }
+        
+        /* Print-specific styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #printable-result, #printable-result * {
+        visibility: visible;
+    }
+    #printable-result {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <button class="hamburger-menu">☰</button>
+            <div class="school-logo-header">
+                <img id="header-school-logo" src="" alt="School Logo">
+            </div>
+            <h1 id="school-name">Excel Academy</h1>
+        </div>
+        <div>
+            <button id="calculate-positions-btn" class="btn-primary">Calculate Positions</button>
+        </div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div style="margin-bottom: 30px;">
+            <h2 style="color: var(--primary); margin-bottom: 20px;">Student Management</h2>
+        </div>
+        
+        <!-- Add Student Section -->
+        <div class="content-section">
+            <h3 style="color: var(--secondary); margin-bottom: 20px;">Add New Student</h3>
+            
+            <!-- Student Photo Upload -->
+            <div class="image-upload-container">
+                <div class="image-preview" id="student-photo-preview">
+                    <span style="color: #666;">Student Photo</span>
+                </div>
+                <label class="upload-btn">
+                    Upload Student Photo
+                    <input type="file" id="student-photo-upload" accept="image/*">
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <input type="text" id="student-name" placeholder="Student Name">
+            </div>
+            
+            <div class="form-group">
+                <select id="student-class">
+                    <!-- Classes will be populated dynamically -->
+                </select>
+            </div>
+            
+            <div class="class-management">
+                <label><strong>Manage Classes</strong></label>
+                <div class="form-group">
+                    <input type="text" id="new-class-name" placeholder="New Class Name">
+                    <button id="add-class-btn" class="btn-secondary" style="margin-top: 10px; width: 100%;">Add Class</button>
+                </div>
+                <div class="class-list" id="class-list">
+                    <!-- Class tags will appear here -->
+                </div>
+            </div>
+            
+            <h4 style="color: var(--primary); margin: 20px 0 15px 0;">Subjects & Scores</h4>
+            <div id="subjects-container"></div>
+            <button id="add-subject-btn" class="btn-secondary" style="width: 100%; margin: 10px 0;">Add Subject</button>
+            
+            <div class="form-group">
+                <textarea id="teacher-comment" placeholder="Teacher's Comment" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <textarea id="principal-comment" placeholder="Principal's Comment" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <textarea id="additional-info" placeholder="Additional Information" rows="3"></textarea>
+            </div>
+            
+            <button id="save-student-btn" class="btn-primary" style="width: 100%; margin-top: 20px;">Save Student</button>
+        </div>
+        
+        <!-- School Settings -->
+        <div class="content-section">
+            <h3 style="color: var(--secondary); margin-bottom: 15px;">School Settings</h3>
+            
+            <!-- School Logo Upload -->
+            <div class="image-upload-container">
+                <div class="image-preview" id="school-logo-preview">
+                    <span style="color: #666;">School Logo</span>
+                </div>
+                <label class="upload-btn">
+                    Upload School Logo
+                    <input type="file" id="school-logo-upload" accept="image/*">
+                </label>
+            </div>
+            
+            <button id="change-school-btn" class="btn-light" style="width: 100%; margin-top: 15px;">Change School Name</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Student List Section -->
+        <div class="content-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--primary);">Student Records</h2>
+                <select id="filter-class" style="width: auto; min-width: 150px;">
+                    <option value="all">All Classes</option>
+                    <!-- Classes will be populated dynamically -->
+                </select>
+            </div>
+            
+            <div id="student-list">
+                <!-- Student cards will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- School Settings Modal -->
+    <div id="school-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary); margin-bottom: 20px;">School Settings</h2>
+            <div class="form-group">
+                <input type="text" id="new-school-name" placeholder="School Name" value="Excel Academy">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="save-school-btn" class="btn-primary">Save</button>
+                <button id="close-school-modal" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary); margin-bottom: 20px;">Student Result</h2>
+            <div id="result-content">
+                <!-- Result content will be generated here -->
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="close-result-modal" class="btn-secondary">Close</button>
+                <button id="print-result-btn" class="btn-primary">Print Result</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div id="edit-student-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary); margin-bottom: 20px;">Edit Student</h2>
+            <div id="edit-student-content">
+                <!-- Edit student form will be generated here -->
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="save-edit-student-btn" class="btn-primary">Save Changes</button>
+                <button id="close-edit-student-modal" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Add a hidden printable result container -->
+<div id="printable-result" style="display: none;"></div>
+
+    <script>
+        // State management
+        let students = JSON.parse(localStorage.getItem('students') || '[]');
+        let classes = JSON.parse(localStorage.getItem('classes') || '["Class 1", "Class 2", "Class 3"]');
+        let schoolName = localStorage.getItem('schoolName') || 'Excel Academy';
+        let schoolLogo = localStorage.getItem('schoolLogo') || '';
+        let currentStudentPhoto = '';
+        let editingStudentId = null;
+        let editStudentPhoto = '';
+
+        // Initialize the application
+        function init() {
+            updateSchoolInfo();
+            renderClasses();
+            renderStudents();
+            addSubjectRow();
+            setupEventListeners();
+            loadSchoolLogo();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Hamburger menu
+            document.querySelector('.hamburger-menu').onclick = () => {
+                document.querySelector('.sidebar').classList.add('active');
+                document.querySelector('.sidebar-overlay').classList.add('active');
+            };
+            
+            document.querySelector('.sidebar-overlay').onclick = () => {
+                document.querySelector('.sidebar').classList.remove('active');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            };
+            
+            // Image upload handlers
+            document.getElementById('school-logo-upload').onchange = handleSchoolLogoUpload;
+            document.getElementById('student-photo-upload').onchange = handleStudentPhotoUpload;
+            
+            // Direct button clicks
+            document.getElementById('change-school-btn').onclick = () => {
+                document.getElementById('school-modal').style.display = 'flex';
+                document.getElementById('new-school-name').value = schoolName;
+            };
+            
+            document.getElementById('save-school-btn').onclick = saveSchoolSettings;
+            document.getElementById('close-school-modal').onclick = () => {
+                document.getElementById('school-modal').style.display = 'none';
+            };
+            
+            document.getElementById('add-subject-btn').onclick = addSubjectRow;
+            document.getElementById('save-student-btn').onclick = saveStudent;
+            document.getElementById('calculate-positions-btn').onclick = calculatePositions;
+            document.getElementById('add-class-btn').onclick = addClass;
+            document.getElementById('close-result-modal').onclick = () => {
+                document.getElementById('result-modal').style.display = 'none';
+            };
+            document.getElementById('print-result-btn').onclick = printResult;
+            document.getElementById('close-edit-student-modal').onclick = () => {
+                document.getElementById('edit-student-modal').style.display = 'none';
+            };
+            document.getElementById('save-edit-student-btn').onclick = saveEditedStudent;
+            
+            document.getElementById('filter-class').onchange = renderStudents;
+            
+            // Close modals when clicking outside
+            window.onclick = (e) => {
+                if (e.target === document.getElementById('school-modal')) {
+                    document.getElementById('school-modal').style.display = 'none';
+                }
+                if (e.target === document.getElementById('result-modal')) {
+                    document.getElementById('result-modal').style.display = 'none';
+                }
+                if (e.target === document.getElementById('edit-student-modal')) {
+                    document.getElementById('edit-student-modal').style.display = 'none';
+                }
+            };
+            
+            // Event delegation for dynamic elements
+            document.addEventListener('click', function(e) {
+                // Remove subject
+                if (e.target.classList.contains('remove-subject')) {
+                    const subjectContainer = e.target.closest('.subject-container');
+                    if (subjectContainer && document.querySelectorAll('.subject-container').length > 1) {
+                        subjectContainer.remove();
+                    } else {
+                        alert('You need at least one subject');
+                    }
+                }
+                
+                // Remove subcategory
+                if (e.target.classList.contains('remove-subcategory')) {
+                    const row = e.target.closest('.subcategory-row');
+                    const container = row.closest('.subcategories-container');
+                    if (container && container.querySelectorAll('.subcategory-row').length > 1) {
+                        row.remove();
+                    } else {
+                        alert('You need at least one subcategory');
+                    }
+                }
+                
+                // Add subcategory
+                if (e.target.classList.contains('add-subcategory-btn')) {
+                    const container = e.target.previousElementSibling;
+                    addSubcategoryRow(container);
+                }
+                
+                // View result
+                if (e.target.classList.contains('view-result')) {
+                    const studentId = e.target.dataset.id;
+                    showStudentResult(studentId);
+                }
+                
+                // Edit student
+                if (e.target.classList.contains('edit-student')) {
+                    const studentId = e.target.dataset.id;
+                    editStudent(studentId);
+                }
+                
+                // Delete student
+                if (e.target.classList.contains('delete-student')) {
+                    const studentId = e.target.dataset.id;
+                    if (confirm('Delete this student?')) {
+                        students = students.filter(s => s.id !== studentId);
+                        localStorage.setItem('students', JSON.stringify(students));
+                        renderStudents();
+                    }
+                }
+                
+                // Remove class
+                if (e.target.classList.contains('remove-class')) {
+                    const className = e.target.dataset.class;
+                    removeClass(className);
+                }
+                
+                // Expand/collapse student card
+                if (e.target.closest('.student-card-header')) {
+                    const studentCard = e.target.closest('.student-card');
+                    studentCard.classList.toggle('expanded');
+                }
+            });
+        }
+
+        // Image handling functions
+        function handleSchoolLogoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                schoolLogo = e.target.result;
+                localStorage.setItem('schoolLogo', schoolLogo);
+                updateSchoolLogoDisplay();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleStudentPhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentStudentPhoto = e.target.result;
+                document.getElementById('student-photo-preview').innerHTML = `<img src="${currentStudentPhoto}" alt="Student Photo">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleEditStudentPhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editStudentPhoto = e.target.result;
+                document.getElementById('edit-student-photo-preview').innerHTML = `<img src="${editStudentPhoto}" alt="Student Photo">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadSchoolLogo() {
+            if (schoolLogo) {
+                updateSchoolLogoDisplay();
+            }
+        }
+
+        function updateSchoolLogoDisplay() {
+            if (schoolLogo) {
+                document.getElementById('header-school-logo').src = schoolLogo;
+                document.getElementById('school-logo-preview').innerHTML = `<img src="${schoolLogo}" alt="School Logo">`;
+            }
+        }
+
+        // School management
+        function updateSchoolInfo() {
+            document.getElementById('school-name').textContent = schoolName;
+        }
+
+        function saveSchoolSettings() {
+            schoolName = document.getElementById('new-school-name').value;
+            document.getElementById('school-name').textContent = schoolName;
+            localStorage.setItem('schoolName', schoolName);
+            document.getElementById('school-modal').style.display = 'none';
+            alert('School name updated!');
+        }
+
+        // Class management
+        function renderClasses() {
+            const classSelect = document.getElementById('student-class');
+            const filterSelect = document.getElementById('filter-class');
+            const classList = document.getElementById('class-list');
+            
+            // Clear existing options
+            classSelect.innerHTML = '';
+            filterSelect.innerHTML = '<option value="all">All Classes</option>';
+            classList.innerHTML = '';
+            
+            // Add classes to dropdowns
+            classes.forEach(className => {
+                // Student class select
+                const option1 = document.createElement('option');
+                option1.value = className;
+                option1.textContent = className;
+                classSelect.appendChild(option1);
+                
+                // Filter select
+                const option2 = document.createElement('option');
+                option2.value = className;
+                option2.textContent = className;
+                filterSelect.appendChild(option2);
+                
+                // Class tag
+                const classTag = document.createElement('div');
+                classTag.className = 'class-tag';
+                classTag.innerHTML = `
+                    ${className}
+                    <button class="remove-class" data-class="${className}">×</button>
+                `;
+                classList.appendChild(classTag);
+            });
+        }
+
+        function addClass() {
+            const newClassName = document.getElementById('new-class-name').value.trim();
+            if (!newClassName) {
+                alert('Please enter a class name');
+                return;
+            }
+            
+            if (classes.includes(newClassName)) {
+                alert('Class already exists');
+                return;
+            }
+            
+            classes.push(newClassName);
+            localStorage.setItem('classes', JSON.stringify(classes));
+            renderClasses();
+            document.getElementById('new-class-name').value = '';
+        }
+
+        function removeClass(className) {
+            if (confirm(`Remove class "${className}"? This won't delete students in this class.`)) {
+                classes = classes.filter(c => c !== className);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                renderClasses();
+            }
+        }
+
+        // Subject management
+        function addSubjectRow() {
+            const subjectContainer = document.createElement('div');
+            subjectContainer.className = 'subject-container';
+            subjectContainer.innerHTML = `
+                <div class="subject-header">
+                    <input type="text" class="subject-name" placeholder="Subject Name" style="flex: 1; margin-right: 10px;">
+                    <button class="remove-subject btn-danger">×</button>
+                </div>
+                <div class="subcategories-container">
+                    <div class="subcategory-row">
+                        <input type="text" class="subcategory-name" placeholder="Topic Name" style="flex: 2;">
+                        <input type="number" class="subcategory-score" placeholder="Score" min="0" max="100" style="flex: 1;">
+                        <button class="remove-subcategory btn-danger">×</button>
+                    </div>
+                </div>
+                <button class="add-subcategory-btn btn-secondary" style="margin-top: 10px;">Add Topic</button>
+                <div class="total-display">
+                    Subject Total: <span class="subject-total">0</span>
+                </div>
+            `;
+            document.getElementById('subjects-container').appendChild(subjectContainer);
+            
+            // Add event listeners to the new score inputs
+            const scoreInputs = subjectContainer.querySelectorAll('.subcategory-score');
+            scoreInputs.forEach(input => {
+                input.addEventListener('input', () => calculateSubjectTotal(subjectContainer));
+            });
+        }
+
+        function addSubcategoryRow(container) {
+            const row = document.createElement('div');
+            row.className = 'subcategory-row';
+            row.innerHTML = `
+                <input type="text" class="subcategory-name" placeholder="Topic Name" style="flex: 2;">
+                <input type="number" class="subcategory-score" placeholder="Score" min="0" max="100" style="flex: 1;">
+                <button class="remove-subcategory btn-danger">×</button>
+            `;
+            container.appendChild(row);
+            
+            // Add event listener to the new score input
+            const scoreInput = row.querySelector('.subcategory-score');
+            scoreInput.addEventListener('input', () => {
+                calculateSubjectTotal(container.closest('.subject-container'));
+            });
+        }
+
+        function calculateSubjectTotal(subjectContainer) {
+            const scoreInputs = subjectContainer.querySelectorAll('.subcategory-score');
+            let total = 0;
+            
+            scoreInputs.forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            
+            const totalElement = subjectContainer.querySelector('.subject-total');
+            if (totalElement) {
+                totalElement.textContent = total;
+            }
+        }
+
+        // Student management
+        function saveStudent() {
+            const name = document.getElementById('student-name').value.trim();
+            const studentClass = document.getElementById('student-class').value;
+            const teacherComment = document.getElementById('teacher-comment').value;
+            const principalComment = document.getElementById('principal-comment').value;
+            const additionalInfo = document.getElementById('additional-info').value;
+            
+            if (!name) {
+                alert('Please enter student name');
+                return;
+            }
+            
+            // Collect subjects
+            const subjects = [];
+            const subjectContainers = document.getElementById('subjects-container').querySelectorAll('.subject-container');
+            
+            subjectContainers.forEach(container => {
+                const subjectName = container.querySelector('.subject-name').value.trim();
+                const subcategories = [];
+                
+                container.querySelectorAll('.subcategory-row').forEach(row => {
+                    const subName = row.querySelector('.subcategory-name').value.trim();
+                    const score = parseInt(row.querySelector('.subcategory-score').value) || 0;
+                    
+                    if (subName) {
+                        subcategories.push({ name: subName, score });
+                    }
+                });
+                
+                if (subjectName && subcategories.length > 0) {
+                    subjects.push({ 
+                        name: subjectName, 
+                        subcategories,
+                        total: subcategories.reduce((sum, sub) => sum + sub.score, 0)
+                    });
+                }
+            });
+            
+            if (subjects.length === 0) {
+                alert('Please add at least one subject with topics');
+                return;
+            }
+            
+            const student = {
+                id: Date.now().toString(),
+                name,
+                class: studentClass,
+                subjects,
+                teacherComment,
+                principalComment,
+                additionalInfo,
+                photo: currentStudentPhoto,
+                position: 0,
+                totalScore: subjects.reduce((sum, subject) => sum + subject.total, 0)
+            };
+            
+            students.push(student);
+            localStorage.setItem('students', JSON.stringify(students));
+            
+            // Reset form
+            document.getElementById('student-name').value = '';
+            document.getElementById('teacher-comment').value = '';
+            document.getElementById('principal-comment').value = '';
+            document.getElementById('additional-info').value = '';
+            document.getElementById('subjects-container').innerHTML = '';
+            document.getElementById('student-photo-preview').innerHTML = '<span style="color: #666;">Student Photo</span>';
+            currentStudentPhoto = '';
+            addSubjectRow();
+            
+            renderStudents();
+            alert('Student saved successfully!');
+            
+            // Close sidebar
+            document.querySelector('.sidebar').classList.remove('active');
+            document.querySelector('.sidebar-overlay').classList.remove('active');
+        }
+
+        function renderStudents() {
+            const filterClass = document.getElementById('filter-class').value;
+            const filteredStudents = filterClass === 'all' ? students : students.filter(s => s.class === filterClass);
+            const studentList = document.getElementById('student-list');
+            
+            studentList.innerHTML = '';
+            
+            if (filteredStudents.length === 0) {
+                studentList.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No students found</p>';
+                return;
+            }
+            
+            filteredStudents.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                
+                let subjectsHTML = '';
+                student.subjects.forEach(subject => {
+                    subjectsHTML += `
+                        <div class="score-item">
+                            <div class="subject-name">${subject.name}</div>
+                            <div class="score-value">${subject.total}</div>
+                        </div>
+                    `;
+                });
+                
+                const studentPhoto = student.photo ? 
+                    `<img src="${student.photo}" alt="${student.name}">` : 
+                    '<span style="color: #666;">No Photo</span>';
+                
+                card.innerHTML = `
+                    <div class="student-card-header">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="student-photo">
+                                ${studentPhoto}
+                            </div>
+                            <div>
+                                <div class="student-name">${student.name}</div>
+                                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                                    <span class="student-class">${student.class}</span>
+                                    ${student.position ? `<span class="student-position">Position: ${student.position}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="expand-arrow">▼</div>
+                    </div>
+                    <div class="student-card-content">
+                        <div class="student-scores">
+                            ${subjectsHTML}
+                        </div>
+                        <div class="total-display">
+                            Total Score: ${student.totalScore}
+                        </div>
+                        <div class="student-actions">
+                            <button class="view-result btn-primary" data-id="${student.id}">View Result</button>
+                            <button class="edit-student btn-secondary" data-id="${student.id}">Edit Student</button>
+                            <button class="delete-student btn-danger" data-id="${student.id}">Delete</button>
+                        </div>
+                    </div>
+                `;
+                
+                studentList.appendChild(card);
+            });
+        }
+
+        function calculatePositions() {
+            if (students.length === 0) {
+                alert('No students to calculate positions for');
+                return;
+            }
+            
+            // Group by class
+            const classes = {};
+            students.forEach(student => {
+                if (!classes[student.class]) classes[student.class] = [];
+                classes[student.class].push(student);
+            });
+            
+            // Calculate positions based on total score
+            Object.values(classes).forEach(classStudents => {
+                classStudents.sort((a, b) => b.totalScore - a.totalScore);
+                
+                classStudents.forEach((student, index) => {
+                    student.position = index + 1;
+                });
+            });
+            
+            localStorage.setItem('students', JSON.stringify(students));
+            renderStudents();
+            alert('Positions calculated!');
+        }
+
+        function showStudentResult(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const studentPhoto = student.photo ? 
+                `<img src="${student.photo}" alt="${student.name}" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary);">` : 
+                '<div style="width: 100px; height: 100px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 3px solid var(--primary); color: #666;">No Photo</div>';
+            
+            let resultHTML = `
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 15px;">
+                        ${schoolLogo ? `<img src="${schoolLogo}" alt="School Logo" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary);">` : ''}
+                        <div>
+                            <h3 style="color: var(--primary); margin: 0;">${schoolName}</h3>
+                            <p style="color: #666; font-size: 0.9rem; margin: 5px 0 0 0;">Student Result</p>
+                        </div>
+                    </div>
+                    ${studentPhoto}
+                    <h4 style="margin: 15px 0 5px 0;">${student.name}</h4>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <strong>Class:</strong><br>
+                            ${student.class}
+                        </div>
+                        <div>
+                            <strong>Position:</strong><br>
+                            ${student.position || 'Not calculated'}
+                        </div>
+                        <div>
+                            <strong>Total Score:</strong><br>
+                            ${student.totalScore}
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Assessment</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            student.subjects.forEach(subject => {
+                subject.subcategories.forEach((sub, index) => {
+                    resultHTML += `
+                        <tr>
+                            ${index === 0 ? `<td rowspan="${subject.subcategories.length}">${subject.name}</td>` : ''}
+                            <td>${sub.name}</td>
+                            <td>${sub.score}</td>
+                        </tr>
+                    `;
+                });
+            });
+            
+            resultHTML += `
+                    </tbody>
+                </table>
+                
+                <div style="background: #e9ecef; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong>Teacher's Comment:</strong><br>
+                        ${student.teacherComment || 'No comment'}
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Principal's Comment:</strong><br>
+                        ${student.principalComment || 'No comment'}
+                    </div>
+                    <div>
+                        <strong>Additional Information:</strong><br>
+                        ${student.additionalInfo || 'None'}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('result-content').innerHTML = resultHTML;
+            document.getElementById('result-modal').style.display = 'flex';
+        }
+
+        function editStudent(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            editingStudentId = studentId;
+            editStudentPhoto = student.photo || '';
+            
+            const studentPhotoPreview = editStudentPhoto ? 
+                `<img src="${editStudentPhoto}" alt="Student Photo">` : 
+                '<span style="color: #666;">Student Photo</span>';
+            
+            let editFormHTML = `
+                <div class="image-upload-container">
+                    <div class="image-preview" id="edit-student-photo-preview">
+                        ${studentPhotoPreview}
+                    </div>
+                    <label class="upload-btn">
+                        Change Student Photo
+                        <input type="file" id="edit-student-photo-upload" accept="image/*">
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="edit-student-name" value="${student.name}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="edit-student-class">
+            `;
+            
+            // Add class options
+            classes.forEach(className => {
+                const selected = className === student.class ? 'selected' : '';
+                editFormHTML += `<option value="${className}" ${selected}>${className}</option>`;
+            });
+            
+            editFormHTML += `
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Teacher's Comment</label>
+                    <textarea id="edit-teacher-comment" rows="3">${student.teacherComment || ''}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Principal's Comment</label>
+                    <textarea id="edit-principal-comment" rows="3">${student.principalComment || ''}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Additional Information</label>
+                    <textarea id="edit-additional-info" rows="3">${student.additionalInfo || ''}</textarea>
+                </div>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 15px 0;">Edit Subjects & Scores</h4>
+                <div id="edit-subjects-container">
+            `;
+            
+            // Add subject containers for editing
+            student.subjects.forEach((subject, subjectIndex) => {
+                editFormHTML += `
+                    <div class="subject-container" data-subject-index="${subjectIndex}">
+                        <div class="subject-header">
+                            <input type="text" class="edit-subject-name" value="${subject.name}" style="flex: 1; margin-right: 10px;">
+                            <button class="remove-subject btn-danger">×</button>
+                        </div>
+                        <div class="subcategories-container">
+                `;
+                
+                subject.subcategories.forEach((subcategory, subIndex) => {
+                    editFormHTML += `
+                        <div class="subcategory-row">
+                            <input type="text" class="edit-subcategory-name" value="${subcategory.name}" style="flex: 2;">
+                            <input type="number" class="edit-subcategory-score" value="${subcategory.score}" min="0" max="100" style="flex: 1;">
+                            <button class="remove-subcategory btn-danger">×</button>
+                        </div>
+                    `;
+                });
+                
+                editFormHTML += `
+                        </div>
+                        <button class="add-subcategory-btn btn-secondary" style="margin-top: 10px;">Add Assessment</button>
+                        <div class="total-display">
+                            Subject Total: <span class="subject-total">${subject.total}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            editFormHTML += `
+                </div>
+                <button id="add-edit-subject-btn" class="btn-secondary" style="width: 100%; margin: 10px 0;">Add Subject</button>
+            `;
+            
+            document.getElementById('edit-student-content').innerHTML = editFormHTML;
+            document.getElementById('edit-student-modal').style.display = 'flex';
+            
+            // Add event listeners for the edit form
+            document.getElementById('add-edit-subject-btn').onclick = addEditSubjectRow;
+            document.getElementById('edit-student-photo-upload').onchange = handleEditStudentPhotoUpload;
+            
+            // Add event listeners to all score inputs in the edit form
+            document.querySelectorAll('#edit-subjects-container .edit-subcategory-score').forEach(input => {
+                input.addEventListener('input', function() {
+                    const subjectContainer = this.closest('.subject-container');
+                    calculateEditSubjectTotal(subjectContainer);
+                });
+            });
+            
+            // Add event delegation for edit form dynamic elements
+            document.getElementById('edit-subjects-container').addEventListener('click', function(e) {
+                // Remove subject in edit form
+                if (e.target.classList.contains('remove-subject')) {
+                    const subjectContainer = e.target.closest('.subject-container');
+                    if (subjectContainer && this.querySelectorAll('.subject-container').length > 1) {
+                        subjectContainer.remove();
+                    } else {
+                        alert('You need at least one subject');
+                    }
+                }
+                
+                // Remove subcategory in edit form
+                if (e.target.classList.contains('remove-subcategory')) {
+                    const row = e.target.closest('.subcategory-row');
+                    const container = row.closest('.subcategories-container');
+                    if (container && container.querySelectorAll('.subcategory-row').length > 1) {
+                        row.remove();
+                        calculateEditSubjectTotal(container.closest('.subject-container'));
+                    } else {
+                        alert('You need at least one assessment');
+                    }
+                }
+                
+                // Add subcategory in edit form
+                if (e.target.classList.contains('add-subcategory-btn')) {
+                    const container = e.target.previousElementSibling;
+                    addEditSubcategoryRow(container);
+                }
+            });
+        }
+
+        function addEditSubjectRow() {
+            const subjectContainer = document.createElement('div');
+            subjectContainer.className = 'subject-container';
+            subjectContainer.innerHTML = `
+                <div class="subject-header">
+                    <input type="text" class="edit-subject-name" placeholder="Subject Name" style="flex: 1; margin-right: 10px;">
+                    <button class="remove-subject btn-danger">×</button>
+                </div>
+                <div class="subcategories-container">
+                    <div class="subcategory-row">
+                        <input type="text" class="edit-subcategory-name" placeholder="Assessment Name" style="flex: 2;">
+                        <input type="number" class="edit-subcategory-score" placeholder="Score" min="0" max="100" style="flex: 1;">
+                        <button class="remove-subcategory btn-danger">×</button>
+                    </div>
+                </div>
+                <button class="add-subcategory-btn btn-secondary" style="margin-top: 10px;">Add Assessment</button>
+                <div class="total-display">
+                    Subject Total: <span class="subject-total">0</span>
+                </div>
+            `;
+            document.getElementById('edit-subjects-container').appendChild(subjectContainer);
+            
+            // Add event listeners to the new score inputs
+            const scoreInputs = subjectContainer.querySelectorAll('.edit-subcategory-score');
+            scoreInputs.forEach(input => {
+                input.addEventListener('input', () => calculateEditSubjectTotal(subjectContainer));
+            });
+        }
+
+        function addEditSubcategoryRow(container) {
+            const row = document.createElement('div');
+            row.className = 'subcategory-row';
+            row.innerHTML = `
+                <input type="text" class="edit-subcategory-name" placeholder="Assessment Name" style="flex: 2;">
+                <input type="number" class="edit-subcategory-score" placeholder="Score" min="0" max="100" style="flex: 1;">
+                <button class="remove-subcategory btn-danger">×</button>
+            `;
+            container.appendChild(row);
+            
+            // Add event listener to the new score input
+            const scoreInput = row.querySelector('.edit-subcategory-score');
+            scoreInput.addEventListener('input', () => {
+                calculateEditSubjectTotal(container.closest('.subject-container'));
+            });
+        }
+
+        function calculateEditSubjectTotal(subjectContainer) {
+            const scoreInputs = subjectContainer.querySelectorAll('.edit-subcategory-score');
+            let total = 0;
+            
+            scoreInputs.forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            
+            const totalElement = subjectContainer.querySelector('.subject-total');
+            if (totalElement) {
+                totalElement.textContent = total;
+            }
+        }
+
+        function saveEditedStudent() {
+            const studentIndex = students.findIndex(s => s.id === editingStudentId);
+            if (studentIndex === -1) return;
+            
+            const name = document.getElementById('edit-student-name').value.trim();
+            const studentClass = document.getElementById('edit-student-class').value;
+            const teacherComment = document.getElementById('edit-teacher-comment').value;
+            const principalComment = document.getElementById('edit-principal-comment').value;
+            const additionalInfo = document.getElementById('edit-additional-info').value;
+            
+            if (!name) {
+                alert('Please enter student name');
+                return;
+            }
+            
+            // Collect subjects from edit form
+            const subjects = [];
+            const subjectContainers = document.getElementById('edit-subjects-container').querySelectorAll('.subject-container');
+            
+            subjectContainers.forEach(container => {
+                const subjectName = container.querySelector('.edit-subject-name').value.trim();
+                const subcategories = [];
+                
+                container.querySelectorAll('.subcategory-row').forEach(row => {
+                    const subName = row.querySelector('.edit-subcategory-name').value.trim();
+                    const score = parseInt(row.querySelector('.edit-subcategory-score').value) || 0;
+                    
+                    if (subName) {
+                        subcategories.push({ name: subName, score });
+                    }
+                });
+                
+                if (subjectName && subcategories.length > 0) {
+                    subjects.push({ 
+                        name: subjectName, 
+                        subcategories,
+                        total: subcategories.reduce((sum, sub) => sum + sub.score, 0)
+                    });
+                }
+            });
+            
+            if (subjects.length === 0) {
+                alert('Please add at least one subject with assessments');
+                return;
+            }
+            
+            // Update student
+            students[studentIndex] = {
+                ...students[studentIndex],
+                name,
+                class: studentClass,
+                subjects,
+                teacherComment,
+                principalComment,
+                additionalInfo,
+                photo: editStudentPhoto || students[studentIndex].photo,
+                totalScore: subjects.reduce((sum, subject) => sum + subject.total, 0)
+            };
+            
+            localStorage.setItem('students', JSON.stringify(students));
+            renderStudents();
+            document.getElementById('edit-student-modal').style.display = 'none';
+            alert('Student updated successfully!');
+        }
+
+        function printResult() {
+    // Get the result content
+    const resultContent = document.getElementById('result-content').innerHTML;
+    
+    // Create a printable version
+    const printableResult = document.getElementById('printable-result');
+    printableResult.innerHTML = resultContent;
+    printableResult.style.display = 'block';
+    
+    // Show the printable version and hide everything else temporarily
+    document.body.classList.add('printing');
+    
+    // Print
+    window.print();
+    
+    // Restore the normal view after printing
+    setTimeout(() => {
+        printableResult.style.display = 'none';
+        document.body.classList.remove('printing');
+    }, 500);
+}
+
+// Alternative print function if the above doesn't work
+function printResultAlternative() {
+    const resultContent = document.getElementById('result-content').innerHTML;
+    
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Student Result - ${schoolName}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px; 
+                    color: #333;
+                }
+                .header { 
+                    text-align: center; 
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #D2691E;
+                    padding-bottom: 20px;
+                }
+                .student-info { 
+                    background: #f8f9fa; 
+                    padding: 20px; 
+                    border-radius: 8px; 
+                    margin-bottom: 20px; 
+                }
+                .result-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin: 20px 0; 
+                }
+                .result-table th, .result-table td { 
+                    border: 1px solid #ddd; 
+                    padding: 12px; 
+                    text-align: left; 
+                }
+                .result-table th { 
+                    background: #0047AB; 
+                    color: white; 
+                }
+                .result-table tr:nth-child(even) {
+                    background: #f9f9f9;
+                }
+                .comments { 
+                    background: #e9ecef; 
+                    padding: 20px; 
+                    border-radius: 8px; 
+                    margin-top: 20px; 
+                }
+                @media print {
+                    body { margin: 0; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            ${resultContent}
+            <div class="no-print" style="text-align: center; margin-top: 30px; font-size: 0.9em; color: #666;">
+                Printed from Student Management System
+            </div>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    printWindow.onload = function() {
+        printWindow.focus();
+        printWindow.print();
+    };
+}
+
+// Update the event listener to use the alternative print function
+document.getElementById('print-result-btn').onclick = printResultAlternative;
+
+        // Start the application when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
